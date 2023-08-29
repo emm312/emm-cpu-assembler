@@ -1,3 +1,3 @@
 .label
-cmp 5 10
+cmp 5, 10
 jeq .label
