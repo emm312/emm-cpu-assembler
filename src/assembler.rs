@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use crate::{
-    ast::{AsmLine, Instruction, Operand},
+    ast::{AsmLine, Instruction, Opcode, Operand},
     gen_instruction,
 };
 
@@ -50,32 +50,67 @@ pub fn remove_labels(ast: Vec<AsmLine>) -> Vec<Instruction> {
 pub fn assemble(instrs: Vec<Instruction>) -> Vec<u8> {
     let mut ret = Vec::new();
     for instruction in instrs {
-        let mut opcode_word = (instruction.opcode as u8) << 3;
+        let mut opcode_word = instruction.opcode as u8;
         let mut register_word = 0_u8;
         let mut append = Vec::new();
-
-        if instruction.operands[0].is_reg() {
-            opcode_word |= instruction.operands[0].unwrap_u8();
-        } else if instruction.operands[0].is_imm() {
-            register_word |= 0b10000000;
-            append.push(instruction.operands[0].unwrap_u8());
-        }
-
-        if instruction.operands[1].is_imm() {
-            if 0b10000000 & register_word != 0 {
-                register_word |= 0b01000000;
-            } else {
+        if instruction.opcode != Opcode::Cmp && instruction.opcode != Opcode::Str && instruction.opcode != Opcode::Pst {
+            if instruction.operands[0].is_reg() && instruction.operands[0] != Operand::None {
+                opcode_word |= instruction.operands[0].unwrap_u8() << 5;
+            } else if instruction.operands[0].is_imm() {
                 register_word |= 0b10000000;
+                append.push(instruction.operands[0].unwrap_u8());
             }
-            append.push(instruction.operands[1].unwrap_u8())
-        } else if instruction.operands[1] != Operand::None {
-            register_word |= instruction.operands[1].unwrap_u8() << 3;
-        }
-        if instruction.operands[2].is_imm() {
-            register_word |= 0b01000000;
-            append.push(instruction.operands[2].unwrap_u8());
-        } else if instruction.operands[2] != Operand::None {
-            register_word |= instruction.operands[2].unwrap_u8();
+
+            if instruction.operands[1].is_imm() {
+                if 0b10000000 & register_word != 0 {
+                    register_word |= 0b01000000;
+                } else {
+                    register_word |= 0b10000000;
+                }
+                append.push(instruction.operands[1].unwrap_u8())
+            } else if instruction.operands[1] != Operand::None {
+                register_word |= instruction.operands[1].unwrap_u8() << 3;
+            }
+            if instruction.operands[2].is_imm() {
+                register_word |= 0b01000000;
+                append.push(instruction.operands[2].unwrap_u8());
+            } else if instruction.operands[2] != Operand::None {
+                register_word |= instruction.operands[2].unwrap_u8();
+            }
+        } else if instruction.opcode == Opcode::Pst {
+            if instruction.operands[0].is_imm() {
+                if 0b10000000 & register_word != 0 {
+                    register_word |= 0b01000000;
+                } else {
+                    register_word |= 0b10000000;
+                }
+                append.push(instruction.operands[0].unwrap_u8());
+            } else if instruction.operands[0] != Operand::None {
+                register_word |= instruction.operands[0].unwrap_u8() << 3;
+            }
+            if instruction.operands[1].is_imm() {
+                register_word |= 0b01000000;
+                append.push(instruction.operands[1].unwrap_u8());
+            } else if instruction.operands[1] != Operand::None {
+                register_word |= instruction.operands[1].unwrap_u8();
+            }
+        } else {
+            if instruction.operands[0].is_imm() {
+                if 0b10000000 & register_word != 0 {
+                    register_word |= 0b01000000;
+                } else {
+                    register_word |= 0b10000000;
+                }
+                append.push(instruction.operands[0].unwrap_u8());
+            } else if instruction.operands[0] != Operand::None {
+                register_word |= instruction.operands[0].unwrap_u8() << 3;
+            }
+            if instruction.operands[1].is_imm() {
+                register_word |= 0b01000000;
+                append.push(instruction.operands[1].unwrap_u8());
+            } else if instruction.operands[1] != Operand::None {
+                register_word |= instruction.operands[1].unwrap_u8();
+            }
         }
         ret.push(opcode_word);
         ret.push(register_word);

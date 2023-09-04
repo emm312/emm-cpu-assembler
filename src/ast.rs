@@ -1,7 +1,7 @@
 #[repr(u8)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Opcode {
-    Hlt = 0b11111111,
+    Hlt = 0b00011111,
     Mov = 0,
     Add,
     Sub,
@@ -26,6 +26,10 @@ pub enum Opcode {
     Str,
     Rsh,
     Lsh,
+    Pst,
+    Pld,
+    Div,
+    Mod
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

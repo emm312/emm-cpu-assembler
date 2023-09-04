@@ -5,7 +5,7 @@ use crate::gen_instruction;
 grammar;
 
 Integer: u8 = r"(-)?[0-9]+" => <>.parse().unwrap();
-Label: String = r"\.([a-z]|[A-Z]|[0-9])*" => <>.to_string();
+Label: String = r"\.([a-z]|[A-Z]|[0-9]|_|-)*" => <>.to_string();
 Register: u8 = r"(R|r)" <int: Integer> => int;
 
 AnyOp: Operand = {
@@ -29,6 +29,8 @@ Instr: Instruction = {
     r"and|AND" <dst: RegOp> "," <op1: AnyOp> "," <op2: AnyOp> => gen_instruction!(And; dst, op1, op2),
     r"or|OR"   <dst: RegOp> "," <op1: AnyOp> "," <op2: AnyOp> => gen_instruction!(Or; dst, op1, op2),
     r"xor|XOR" <dst: RegOp> "," <op1: AnyOp> "," <op2: AnyOp> => gen_instruction!(Xor; dst, op1, op2),
+    r"div|DIV" <dst: RegOp> "," <op1: AnyOp> "," <op2: AnyOp> => gen_instruction!(Div; dst, op1, op2),
+    r"mod|MOD" <dst: RegOp> "," <op1: AnyOp> "," <op2: AnyOp> => gen_instruction!(Mod; dst, op1, op2),
     r"not|NOT" <dst: RegOp> "," <op1: AnyOp> => gen_instruction!(Not; dst, op1),
     r"cmp|CMP" <op1: AnyOp> "," <op2: AnyOp> => gen_instruction!(Cmp; op1, op2),
     r"jgr|JGR" <dst: LabelOp> => gen_instruction!(Jgr; dst),
@@ -45,7 +47,9 @@ Instr: Instruction = {
     r"lod|LOD" <dst: RegOp> "," <src: AnyOp> => gen_instruction!(Lod; dst, src),
     r"str|STR" <dst: AnyOp> "," <src: AnyOp> => gen_instruction!(Str; dst, src),
     r"rsh|RSH" <dst: RegOp> "," <src: AnyOp> => gen_instruction!(Rsh; dst, src),
-    r"lsh|LSH" <dst: RegOp> "," <src: AnyOp> => gen_instruction!(Lsh; dst, src)
+    r"lsh|LSH" <dst: RegOp> "," <src: AnyOp> => gen_instruction!(Lsh; dst, src),
+    r"pst|PST" <dst: AnyOp> "," <src: AnyOp> => gen_instruction!(Pst; dst, src),
+    r"pld|PLD" <dst: RegOp> "," <src: AnyOp> => gen_instruction!(Pld; dst, src),
 };
 pub AsmMember: AsmLine = {
     Instr => AsmLine::Instruction(<>),
