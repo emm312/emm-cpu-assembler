@@ -20,11 +20,7 @@ fn main() {
         exit(-1);
     }));
     let mut output = String::new();
+    let mut file = std::fs::File::create(args.output).unwrap();
     for word in cool_cpu_assembler::assembler::assemble(ast) {
-        output.push_str(&format!("{:02x}\n", word));
-    }
-    std::fs::File::create(args.output)
-        .unwrap()
-        .write_all(&output.as_bytes())
-        .unwrap();
-}
+        file.write(&word.to_le_bytes()).unwrap();
+    }}
