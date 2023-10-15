@@ -24,7 +24,7 @@ fn main() {
     output += "always_comb begin\ncase(read_pos)\n";
     for (pos, word) in cool_cpu_assembler::assembler::assemble(ast).into_iter().enumerate() {
         output += &format!("{}: data_inner = 8'h{:02x};\n", pos, word);
-        file.write_all(&word.to_le_bytes()).unwrap();
     }
     output += "default: data_inner = 8'h00;\nendcase\nend";
+    file.write_all(output.as_bytes()).unwrap();
 }
