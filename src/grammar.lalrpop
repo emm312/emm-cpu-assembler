@@ -4,6 +4,44 @@ use crate::gen_instruction;
 
 grammar;
 
+match {
+    r"\s*" => {},
+    r"\/\/.*" => {},
+    r"(-)?[0-9]+",
+    r"\.([a-z]|[A-Z]|[0-9]|_|-)*",
+    r"(R|r)",
+    r"hlt|HLT",
+    r"mov|MOV",
+    r"add|ADD",
+    r"sub|SUB",
+    r"mul|MUL",
+    r"and|AND",
+    r"or|OR",
+    r"xor|XOR",
+    r"div|DIV",
+    r"mod|MOD",
+    r"not|NOT",
+    r"cmp|CMP",
+    r"jgr|JGR",
+    r"jlt|JLT",
+    r"jge|JGE",
+    r"jle|JLE",
+    r"jeq|JEQ",
+    r"jnq|JNQ",
+    r"jmp|JMP",
+    r"cal|CAL",
+    r"ret|RET",
+    r"psh|PSH",
+    r"pop|POP",
+    r"lod|LOD",
+    r"str|STR",
+    r"rsh|RSH",
+    r"lsh|LSH",
+    r"pst|PST",
+    r"pld|PLD",
+    ",",
+}
+
 Integer: u8 = r"(-)?[0-9]+" => <>.parse().unwrap();
 Label: String = r"\.([a-z]|[A-Z]|[0-9]|_|-)*" => <>.to_string();
 Register: u8 = r"(R|r)" <int: Integer> => int;
